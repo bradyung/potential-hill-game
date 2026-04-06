@@ -471,15 +471,15 @@
           const gx = (sample(x + 1, y) - sample(x - 1, y)) * 0.5;
           const gy = (sample(x, y + 1) - sample(x, y - 1)) * 0.5;
           const gradMag = Math.hypot(gx, gy);
-          const contourBoost = 0.12 * Math.sin(t * Math.PI * 18 + world.shimmer * 0.3);
-          const peakGlow = Math.max(0, (t - 0.75) / 0.25) * 0.12;
+          const contourBoost = 0.10 * Math.sin(t * Math.PI * 18 + world.shimmer * 0.22);
+          const peakGlow = Math.max(0, (t - 0.75) / 0.25) * 0.10;
 
           const hue = 225 - t * 185;
-          const sat = 82 + t * 10;
-          const light = 30 + t * 34 + contourBoost * 12 + peakGlow * 20 + Math.min(0.08, gradMag * 0.7) * 10;
+          const sat = 84 + t * 8;
+          const light = 31 + t * 33 + contourBoost * 10 + peakGlow * 18 + Math.min(0.06, gradMag * 0.55) * 10;
 
           const rgb = hslToRgb(hue / 360, sat / 100, clamp(light / 100, 0, 1));
-          const shade = clamp(1 + (-gx * 0.55 + -gy * 0.55), 0.86, 1.14);
+          const shade = clamp(1 + (-gx * 0.48 + -gy * 0.48), 0.88, 1.12);
           const i = (y * world.w + x) * 4;
           img.data[i] = clamp(Math.floor(rgb[0] * shade), 0, 255);
           img.data[i + 1] = clamp(Math.floor(rgb[1] * shade), 0, 255);
@@ -531,21 +531,20 @@
     function drawVectorField() {
       if (!world.showVectorField || world.state === 'title') return;
       ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,255,0.30)';
-      ctx.fillStyle = 'rgba(255,255,255,0.30)';
       ctx.lineWidth = 1.15;
       const step = 11;
+      const pulse = 0.85 + Math.sin(world.shimmer * 1.6) * 0.04;
       for (let y = 9; y < world.h; y += step) {
         for (let x = 9; x < world.w; x += step) {
           const g = gradient(x, y);
           const n = normalized(g.x, g.y);
+          const mag = Math.hypot(g.x, g.y);
           const sx = x * world.cell;
           const sy = y * world.cell;
-          const len = 9.5;
+          const len = (8.8 + Math.min(1.9, mag * 30)) * pulse;
           const ex = sx + n.x * len;
           const ey = sy + n.y * len;
-          const mag = Math.hypot(g.x, g.y);
-          const alpha = Math.min(0.46, 0.18 + mag * 7.5);
+          const alpha = Math.min(0.5, 0.16 + mag * 6.8);
           ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
           ctx.fillStyle = `rgba(255,255,255,${alpha})`;
           ctx.beginPath();
@@ -609,16 +608,16 @@
     function drawStars() {
       for (const s of world.stars) {
         if (s.taken) continue;
-        s.pulse += 0.06;
+        s.pulse += 0.05;
         const px = s.x * world.cell;
         const py = s.y * world.cell;
-        const r = 7 + Math.sin(s.pulse) * 1.4;
+        const r = 6.5 + Math.sin(s.pulse) * 1.2;
         ctx.save();
         ctx.translate(px, py);
-        ctx.rotate(s.pulse * 0.3);
-        ctx.fillStyle = 'rgba(254,240,138,0.18)';
+        ctx.rotate(s.pulse * 0.22);
+        ctx.fillStyle = 'rgba(254,240,138,0.14)';
         ctx.beginPath();
-        ctx.arc(0, 0, r + 5, 0, Math.PI * 2);
+        ctx.arc(0, 0, r + 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#fef08a';
         ctx.beginPath();
@@ -662,15 +661,15 @@
       const g = gradient(player.x, player.y);
       const moveDir = normalized(player.vx, player.vy);
       const uphillGlow = Math.max(0, moveDir.x * g.x + moveDir.y * g.y);
-      const stretchX = 1 + Math.min(0.12, Math.abs(player.vx) * 0.01) + player.squash * 0.3;
-      const stretchY = 1 + Math.min(0.12, Math.abs(player.vy) * 0.01) - player.squash * 0.2;
+      const stretchX = 1 + Math.min(0.10, Math.abs(player.vx) * 0.009) + player.squash * 0.24;
+      const stretchY = 1 + Math.min(0.10, Math.abs(player.vy) * 0.009) - player.squash * 0.16;
 
       ctx.save();
       ctx.translate(px, py);
       ctx.scale(stretchX, stretchY);
       ctx.beginPath();
-      ctx.arc(0, 0, player.r * world.cell + 4 + Math.min(3, uphillGlow * 7), 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(125,211,252,${0.12 + Math.min(0.18, uphillGlow * 0.35)})`;
+      ctx.arc(0, 0, player.r * world.cell + 4 + Math.min(2.5, uphillGlow * 6), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(125,211,252,${0.11 + Math.min(0.16, uphillGlow * 0.28)})`;
       ctx.fill();
       ctx.beginPath();
       ctx.arc(0, 0, player.r * world.cell, 0, Math.PI * 2);
@@ -715,16 +714,16 @@
       const moveDir = normalized(player.vx, player.vy);
       const alignment = moveDir.x * g.x + moveDir.y * g.y;
       const speed = Math.hypot(player.vx, player.vy);
-      if (speed > 2 && alignment > 0.01 && Math.random() < 0.35) {
+      if (speed > 2.2 && alignment > 0.01 && Math.random() < 0.22) {
         const px = player.x * world.cell;
         const py = player.y * world.cell;
         world.uphillParticles.push({
           x: px - moveDir.x * 8,
           y: py - moveDir.y * 8,
-          vx: -moveDir.x * (25 + Math.random() * 20),
-          vy: -moveDir.y * (25 + Math.random() * 20),
-          life: 0.45 + Math.random() * 0.25,
-          maxLife: 0.7
+          vx: -moveDir.x * (22 + Math.random() * 16),
+          vy: -moveDir.y * (22 + Math.random() * 16),
+          life: 0.36 + Math.random() * 0.18,
+          maxLife: 0.54
         });
       }
 
@@ -741,9 +740,9 @@
       ctx.save();
       for (const p of world.uphillParticles) {
         const a = p.life / p.maxLife;
-        ctx.fillStyle = `rgba(125,211,252,${a * 0.8})`;
+        ctx.fillStyle = `rgba(125,211,252,${a * 0.65})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2 + a * 2, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 1.8 + a * 1.8, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
@@ -773,7 +772,7 @@
         const a = p.life / p.maxLife;
         ctx.fillStyle = `rgba(254,240,138,${a})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2 + a * 4, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 2 + a * 3.3, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
@@ -962,7 +961,7 @@
       ui.hints.textContent = world.hintsLeft;
       ui.best.textContent = world.bestTimes[world.levelIndex] == null ? '--' : `${world.bestTimes[world.levelIndex].toFixed(1)}s`;
 
-      if ((Math.floor(world.shimmer * 4) % 6) === 0) rebuildTerrainTexture();
+      if ((Math.floor(world.shimmer * 3) % 9) === 0) rebuildTerrainTexture();
     }
 
     function render(dt) {
