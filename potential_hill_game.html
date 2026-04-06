@@ -7,12 +7,13 @@
   <style>
     :root {
       --bg: #0b1020;
-      --panel: rgba(10, 15, 30, 0.88);
+      --panel: rgba(10, 15, 30, 0.9);
       --text: #eef2ff;
       --muted: #b9c2e3;
       --accent: #7dd3fc;
       --accent2: #c084fc;
       --good: #86efac;
+      --gold: #fef08a;
       --warn: #fca5a5;
       --shadow: 0 14px 40px rgba(0,0,0,.35);
     }
@@ -22,8 +23,7 @@
     body {
       margin: 0;
       font-family: Inter, system-ui, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top, #18213f 0%, #0b1020 48%, #050814 100%);
+      background: radial-gradient(circle at top, #18213f 0%, #0b1020 48%, #050814 100%);
       color: var(--text);
       min-height: 100vh;
       display: grid;
@@ -32,9 +32,9 @@
     }
 
     .wrap {
-      width: min(1100px, 100%);
+      width: min(1160px, 100%);
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 1fr 290px;
       gap: 18px;
       align-items: start;
     }
@@ -47,9 +47,8 @@
       backdrop-filter: blur(10px);
     }
 
-    .game-card {
-      padding: 16px;
-    }
+    .game-card { padding: 16px; }
+    .side-card { padding: 18px; }
 
     canvas {
       width: 100%;
@@ -59,21 +58,8 @@
       background: #111827;
     }
 
-    .side-card {
-      padding: 18px;
-    }
-
-    h1 {
-      margin: 0 0 6px;
-      font-size: 1.8rem;
-    }
-
-    .sub {
-      color: var(--muted);
-      line-height: 1.45;
-      margin-bottom: 16px;
-      font-size: .95rem;
-    }
+    h1 { margin: 0 0 6px; font-size: 1.8rem; }
+    .sub { color: var(--muted); line-height: 1.45; margin-bottom: 14px; font-size: .95rem; }
 
     .stat-grid {
       display: grid;
@@ -89,22 +75,10 @@
       padding: 12px;
     }
 
-    .stat .label {
-      color: var(--muted);
-      font-size: .8rem;
-      margin-bottom: 6px;
-    }
+    .stat .label { color: var(--muted); font-size: .8rem; margin-bottom: 6px; }
+    .stat .value { font-size: 1.02rem; font-weight: 700; }
 
-    .stat .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .controls {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
+    .controls { display: grid; gap: 10px; margin-top: 12px; }
 
     button {
       border: none;
@@ -121,80 +95,49 @@
 
     button:hover { transform: translateY(-1px); }
     button:active { transform: translateY(1px); }
+    .ghost { background: rgba(255,255,255,.07); box-shadow: none; }
 
-    .ghost {
-      background: rgba(255,255,255,.07);
-      box-shadow: none;
-    }
-
-    .tips {
-      margin-top: 16px;
-      color: var(--muted);
-      font-size: .9rem;
-      line-height: 1.5;
-    }
-
+    .tips { margin-top: 16px; color: var(--muted); font-size: .9rem; line-height: 1.5; }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(134,239,172,.12);
-      color: var(--good);
-      font-weight: 700;
-      border: 1px solid rgba(134,239,172,.2);
-      margin-bottom: 12px;
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+      background: rgba(134,239,172,.12); color: var(--good); font-weight: 700;
+      border: 1px solid rgba(134,239,172,.2); margin-bottom: 12px;
     }
+    .footer-note { margin-top: 12px; color: var(--muted); font-size: .8rem; }
 
-    .footer-note {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: .8rem;
-    }
-
-    @media (max-width: 930px) {
-      .wrap {
-        grid-template-columns: 1fr;
-      }
-    }
+    @media (max-width: 930px) { .wrap { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="wrap">
     <section class="game-card">
-      <canvas id="game" width="760" height="760"></canvas>
+      <canvas id="game" width="820" height="820"></canvas>
     </section>
 
     <aside class="side-card">
-      <div class="badge">Unit 6 SDL Idea</div>
+      <div class="badge">SDL 6 Prototype</div>
       <h1>Potential Hill</h1>
       <div class="sub">
-        Move around the field and climb toward the highest potential. The arrow shows the local gradient direction, which points uphill.
+        Climb a potential field, follow the gradient, and find the true highest point. Each level introduces one new idea.
       </div>
 
       <div class="stat-grid">
-        <div class="stat">
-          <div class="label">Level</div>
-          <div class="value" id="levelText">1</div>
-        </div>
-        <div class="stat">
-          <div class="label">Score</div>
-          <div class="value" id="scoreText">0</div>
-        </div>
-        <div class="stat">
-          <div class="label">Potential</div>
-          <div class="value" id="heightText">0.000</div>
-        </div>
-        <div class="stat">
-          <div class="label">Time</div>
-          <div class="value" id="timeText">0.0s</div>
-        </div>
+        <div class="stat"><div class="label">State</div><div class="value" id="stateText">Title</div></div>
+        <div class="stat"><div class="label">Level</div><div class="value" id="levelText">1 / 5</div></div>
+        <div class="stat"><div class="label">Score</div><div class="value" id="scoreText">0</div></div>
+        <div class="stat"><div class="label">Time</div><div class="value" id="timeText">0.0s</div></div>
+        <div class="stat"><div class="label">Potential</div><div class="value" id="heightText">0.000</div></div>
+        <div class="stat"><div class="label">∇f(x,y)</div><div class="value" id="gradText">(0.00, 0.00)</div></div>
+        <div class="stat"><div class="label">Hints Left</div><div class="value" id="hintText">3</div></div>
+        <div class="stat"><div class="label">Best Time</div><div class="value" id="bestText">--</div></div>
       </div>
 
       <div class="controls">
-        <button id="newBtn">New Level</button>
-        <button id="hintBtn" class="ghost">Toggle Hint Arrow</button>
+        <button id="startBtn">Start / Continue</button>
+        <button id="restartBtn" class="ghost">Restart Level</button>
+        <button id="nextBtn" class="ghost">Next Level</button>
+        <button id="hintBtn" class="ghost">Use Hint</button>
+        <button id="fieldBtn" class="ghost">Toggle Vector Field</button>
         <button id="contourBtn" class="ghost">Toggle Contours</button>
       </div>
 
@@ -202,13 +145,13 @@
         <strong>Controls:</strong><br>
         WASD or arrow keys to move.<br><br>
         <strong>Goal:</strong><br>
-        Reach the glowing peak circle as fast as you can.<br><br>
+        Reach the glowing true peak. Some levels include traps or misleading hills.<br><br>
         <strong>Math link:</strong><br>
-        The color map shows a potential function. Brighter regions are higher. The blue arrow is the gradient, which points in the direction of steepest increase.
+        Brighter areas are usually higher potential. The gradient points in the direction of steepest increase.
       </div>
 
       <div class="footer-note">
-        Runs in any modern browser on Linux or Windows. Save this file and open it.
+        Runs in a browser on Linux or Windows.
       </div>
     </aside>
   </div>
@@ -218,14 +161,107 @@
     const ctx = canvas.getContext('2d');
 
     const ui = {
+      state: document.getElementById('stateText'),
       level: document.getElementById('levelText'),
       score: document.getElementById('scoreText'),
-      height: document.getElementById('heightText'),
       time: document.getElementById('timeText'),
-      newBtn: document.getElementById('newBtn'),
+      height: document.getElementById('heightText'),
+      grad: document.getElementById('gradText'),
+      hints: document.getElementById('hintText'),
+      best: document.getElementById('bestText'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      nextBtn: document.getElementById('nextBtn'),
       hintBtn: document.getElementById('hintBtn'),
+      fieldBtn: document.getElementById('fieldBtn'),
       contourBtn: document.getElementById('contourBtn')
     };
+
+    const LEVELS = [
+      {
+        name: 'Level 1: Simple Hill',
+        intro: 'A single hill. Follow the gradient uphill to the highest point.',
+        peaks: [{ x: 86, y: 35, a: 1.45, s: 340 }],
+        sinks: [],
+        twist: { fx: 0.04, fy: 0.04, amp: 0.03 },
+        start: { x: 18, y: 98 },
+        hints: 5,
+        timeBonus: 250,
+        field: true,
+        falseSummit: null,
+        hardTerrain: false,
+        takeaway: 'A gradient points uphill toward larger potential values.'
+      },
+      {
+        name: 'Level 2: Two Hills',
+        intro: 'Two peaks appear. One is higher than the other.',
+        peaks: [
+          { x: 44, y: 66, a: 0.95, s: 270 },
+          { x: 88, y: 30, a: 1.42, s: 300 }
+        ],
+        sinks: [],
+        twist: { fx: 0.06, fy: 0.05, amp: 0.04 },
+        start: { x: 14, y: 20 },
+        hints: 4,
+        timeBonus: 290,
+        field: true,
+        falseSummit: null,
+        hardTerrain: false,
+        takeaway: 'Not every nearby high point is the maximum.'
+      },
+      {
+        name: 'Level 3: False Summit',
+        intro: 'One hill looks tempting, but it is not the true highest point.',
+        peaks: [
+          { x: 33, y: 38, a: 1.08, s: 200 },
+          { x: 94, y: 88, a: 1.55, s: 360 }
+        ],
+        sinks: [{ x: 70, y: 55, a: 0.45, s: 180 }],
+        twist: { fx: 0.08, fy: 0.06, amp: 0.05 },
+        start: { x: 20, y: 26 },
+        hints: 3,
+        timeBonus: 330,
+        field: true,
+        falseSummit: { x: 33, y: 38 },
+        hardTerrain: false,
+        takeaway: 'Local highs can mislead you when searching for the global maximum.'
+      },
+      {
+        name: 'Level 4: Valley Trap',
+        intro: 'Watch out for the sink between you and the true peak.',
+        peaks: [{ x: 98, y: 24, a: 1.45, s: 310 }],
+        sinks: [{ x: 55, y: 52, a: 0.95, s: 220 }],
+        twist: { fx: 0.08, fy: 0.09, amp: 0.06 },
+        start: { x: 12, y: 96 },
+        hints: 3,
+        timeBonus: 360,
+        field: true,
+        falseSummit: null,
+        hardTerrain: false,
+        takeaway: 'A sink lowers the potential and changes the way uphill paths bend.'
+      },
+      {
+        name: 'Level 5: Weak Hints',
+        intro: 'Harder terrain and fewer hints. Trust the gradient and the field.',
+        peaks: [
+          { x: 26, y: 24, a: 0.8, s: 160 },
+          { x: 70, y: 48, a: 1.1, s: 230 },
+          { x: 101, y: 21, a: 1.62, s: 320 }
+        ],
+        sinks: [
+          { x: 50, y: 82, a: 0.65, s: 180 },
+          { x: 86, y: 66, a: 0.45, s: 140 }
+        ],
+        twist: { fx: 0.1, fy: 0.08, amp: 0.07 },
+        start: { x: 16, y: 102 },
+        hints: 1,
+        timeBonus: 420,
+        field: false,
+        falseSummit: { x: 70, y: 48 },
+        hardTerrain: true,
+        takeaway: 'Even with limited guidance, the gradient still points toward steeper increase.'
+      }
+    ];
 
     const world = {
       w: 120,
@@ -235,85 +271,62 @@
       min: 0,
       max: 1,
       peak: { x: 60, y: 60 },
-      level: 1,
-      showHint: true,
+      falseSummit: null,
+      levelIndex: 0,
+      showVectorField: true,
       showContours: true,
       score: 0,
       startTime: 0,
       elapsed: 0,
       won: false,
-      winPulse: 0
+      winPulse: 0,
+      state: 'title',
+      hintTimer: 0,
+      hintsLeft: 3,
+      bestTimes: Array(LEVELS.length).fill(null),
+      titlePulse: 0,
+      message: '',
+      messageTimer: 0,
+      particles: [],
+      peakPop: 0,
+      shimmer: 0
     };
 
     const player = {
       x: 14,
       y: 14,
-      r: 1.35,
-      speed: 14,
+      r: 1.45,
+      vx: 0,
+      vy: 0,
+      accel: 34,
+      friction: 0.92,
+      maxSpeed: 14,
       trail: []
     };
 
     const keys = {};
 
-    function rand(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    function clamp(v, lo, hi) {
-      return Math.max(lo, Math.min(hi, v));
-    }
-
-    function dist(ax, ay, bx, by) {
-      const dx = ax - bx;
-      const dy = ay - by;
-      return Math.hypot(dx, dy);
-    }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function dist(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by); }
 
     function potentialAt(x, y, peaks, sinks, twist) {
       let val = 0;
       for (const p of peaks) {
-        const dx = x - p.x;
-        const dy = y - p.y;
+        const dx = x - p.x, dy = y - p.y;
         val += p.a * Math.exp(-(dx * dx + dy * dy) / p.s);
       }
       for (const s of sinks) {
-        const dx = x - s.x;
-        const dy = y - s.y;
+        const dx = x - s.x, dy = y - s.y;
         val -= s.a * Math.exp(-(dx * dx + dy * dy) / s.s);
       }
-      val += 0.15 * Math.sin(x * twist.fx) * Math.cos(y * twist.fy);
+      val += twist.amp * Math.sin(x * twist.fx) * Math.cos(y * twist.fy);
       return val;
     }
 
-    function buildLevel(level) {
-      const peaks = [];
-      const sinks = [];
-      const peakCount = Math.min(2 + Math.floor(level / 2), 4);
-      const sinkCount = Math.min(1 + Math.floor(level / 3), 3);
-
-      for (let i = 0; i < peakCount; i++) {
-        peaks.push({
-          x: rand(25, 95),
-          y: rand(25, 95),
-          a: rand(0.8, 1.55),
-          s: rand(160, 420)
-        });
-      }
-
-      for (let i = 0; i < sinkCount; i++) {
-        sinks.push({
-          x: rand(18, 102),
-          y: rand(18, 102),
-          a: rand(0.25, 0.8),
-          s: rand(120, 280)
-        });
-      }
-
-      const twist = {
-        fx: rand(0.06, 0.12),
-        fy: rand(0.06, 0.12)
-      };
-
+    function buildLevel(index, preserveScore = true) {
+      const level = LEVELS[index];
+      if (!preserveScore) world.score = 0;
+      world.levelIndex = index;
       world.values = [];
       world.min = Infinity;
       world.max = -Infinity;
@@ -322,7 +335,7 @@
       for (let y = 0; y < world.h; y++) {
         const row = [];
         for (let x = 0; x < world.w; x++) {
-          const v = potentialAt(x, y, peaks, sinks, twist);
+          const v = potentialAt(x, y, level.peaks, level.sinks, level.twist);
           row.push(v);
           if (v < world.min) world.min = v;
           if (v > world.max) world.max = v;
@@ -332,21 +345,24 @@
       }
 
       world.peak = { x: best.x, y: best.y };
-
-      let startFound = false;
-      while (!startFound) {
-        player.x = rand(8, 112);
-        player.y = rand(8, 112);
-        if (dist(player.x, player.y, world.peak.x, world.peak.y) > 42) {
-          startFound = true;
-        }
-      }
-
+      world.falseSummit = level.falseSummit;
+      player.x = level.start.x;
+      player.y = level.start.y;
+      player.vx = 0;
+      player.vy = 0;
       player.trail = [];
       world.won = false;
       world.winPulse = 0;
+      world.peakPop = 0;
       world.startTime = performance.now();
       world.elapsed = 0;
+      world.hintTimer = 0;
+      world.hintsLeft = level.hints;
+      world.showVectorField = level.field;
+      world.message = level.intro;
+      world.messageTimer = 5.5;
+      world.particles = [];
+      world.state = 'playing';
     }
 
     function sample(x, y) {
@@ -367,41 +383,81 @@
       return { x: vx / m, y: vy / m, m };
     }
 
-    function colorFor(v) {
+    function colorFor(v, x, y) {
       const t = (v - world.min) / (world.max - world.min || 1);
-      const r = Math.floor(25 + t * 225);
-      const g = Math.floor(40 + t * 190);
-      const b = Math.floor(90 + (1 - Math.abs(t - 0.5) * 2) * 130);
+      const shimmerBoost = t > 0.72 ? (Math.sin(world.shimmer + x * 0.17 + y * 0.13) + 1) * 0.03 : 0;
+      const tt = Math.min(1, t + shimmerBoost);
+      const r = Math.floor(20 + tt * 225);
+      const g = Math.floor(35 + tt * 205);
+      const b = Math.floor(95 + (1 - Math.abs(tt - 0.5) * 2) * 125);
       return `rgb(${r},${g},${b})`;
     }
 
     function drawField() {
       for (let y = 0; y < world.h; y++) {
         for (let x = 0; x < world.w; x++) {
-          ctx.fillStyle = colorFor(world.values[y][x]);
+          ctx.fillStyle = colorFor(world.values[y][x], x, y);
           ctx.fillRect(x * world.cell, y * world.cell, Math.ceil(world.cell), Math.ceil(world.cell));
         }
       }
+
+      const px = player.x * world.cell;
+      const py = player.y * world.cell;
+      const gradientOverlay = ctx.createRadialGradient(px, py, 10, px, py, 165);
+      gradientOverlay.addColorStop(0, 'rgba(255,255,255,0.13)');
+      gradientOverlay.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = gradientOverlay;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     function drawContours() {
       if (!world.showContours) return;
       ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
       ctx.lineWidth = 1;
-      const levels = 9;
+      const levels = 10;
       for (let i = 1; i < levels; i++) {
         const target = world.min + (i / levels) * (world.max - world.min);
         ctx.beginPath();
         for (let y = 1; y < world.h - 1; y++) {
           for (let x = 1; x < world.w - 1; x++) {
             const v = world.values[y][x];
-            if (Math.abs(v - target) < 0.012) {
-              ctx.rect(x * world.cell, y * world.cell, world.cell, world.cell);
-            }
+            if (Math.abs(v - target) < 0.012) ctx.rect(x * world.cell, y * world.cell, world.cell, world.cell);
           }
         }
         ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawVectorField() {
+      if (!world.showVectorField || world.state === 'title') return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.24)';
+      ctx.fillStyle = 'rgba(255,255,255,0.24)';
+      ctx.lineWidth = 1.3;
+      const step = 12;
+      for (let y = 8; y < world.h; y += step) {
+        for (let x = 8; x < world.w; x += step) {
+          const g = gradient(x, y);
+          const n = normalized(g.x, g.y);
+          const sx = x * world.cell;
+          const sy = y * world.cell;
+          const len = 11;
+          const ex = sx + n.x * len;
+          const ey = sy + n.y * len;
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(ex, ey);
+          ctx.stroke();
+          const ang = Math.atan2(n.y, n.x);
+          ctx.beginPath();
+          ctx.moveTo(ex, ey);
+          ctx.lineTo(ex - 4 * Math.cos(ang - 0.5), ey - 4 * Math.sin(ang - 0.5));
+          ctx.lineTo(ex - 4 * Math.cos(ang + 0.5), ey - 4 * Math.sin(ang + 0.5));
+          ctx.closePath();
+          ctx.fill();
+        }
       }
       ctx.restore();
     }
@@ -410,48 +466,77 @@
       const px = (world.peak.x + 0.5) * world.cell;
       const py = (world.peak.y + 0.5) * world.cell;
       world.winPulse += 0.05;
-      const pulse = 1 + Math.sin(world.winPulse) * 0.08;
+      const pulse = 1 + Math.sin(world.winPulse) * 0.09 + world.peakPop;
 
       ctx.save();
       ctx.beginPath();
-      ctx.arc(px, py, 12 * pulse, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,0.14)';
+      ctx.arc(px, py, 23 * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(254,240,138,0.12)';
       ctx.fill();
-
       ctx.beginPath();
-      ctx.arc(px, py, 7 * pulse, 0, Math.PI * 2);
+      ctx.arc(px, py, 14 * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(254,240,138,0.18)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px, py, 8 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = '#fef08a';
       ctx.fill();
       ctx.restore();
+
+      if (world.falseSummit) {
+        const fx = (world.falseSummit.x + 0.5) * world.cell;
+        const fy = (world.falseSummit.y + 0.5) * world.cell;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(fx, fy, 18, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(248,113,113,0.12)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(fx, fy, 10, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(248,113,113,0.18)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(fx, fy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#f87171';
+        ctx.fill();
+        ctx.restore();
+      }
     }
 
     function drawTrail() {
       if (player.trail.length < 2) return;
       ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,255,0.45)';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      for (let i = 0; i < player.trail.length; i++) {
-        const p = player.trail[i];
-        const sx = p.x * world.cell;
-        const sy = p.y * world.cell;
-        if (i === 0) ctx.moveTo(sx, sy);
-        else ctx.lineTo(sx, sy);
+      for (let i = 1; i < player.trail.length; i++) {
+        const a = player.trail[i - 1];
+        const b = player.trail[i];
+        const uphill = b.v > a.v;
+        const alpha = i / player.trail.length * (uphill ? 0.55 : 0.32);
+        ctx.strokeStyle = uphill ? `rgba(125,211,252,${alpha})` : `rgba(255,255,255,${alpha})`;
+        ctx.lineWidth = uphill ? 2.6 : 2;
+        ctx.beginPath();
+        ctx.moveTo(a.x * world.cell, a.y * world.cell);
+        ctx.lineTo(b.x * world.cell, b.y * world.cell);
+        ctx.stroke();
       }
-      ctx.stroke();
       ctx.restore();
     }
 
     function drawPlayer() {
       const px = player.x * world.cell;
       const py = player.y * world.cell;
+      const g = gradient(player.x, player.y);
+      const vel = Math.hypot(player.vx, player.vy);
+      const uphillGlow = Math.max(0, normalized(player.vx, player.vy).x * g.x + normalized(player.vx, player.vy).y * g.y);
 
       ctx.save();
       ctx.beginPath();
-      ctx.arc(px, py, player.r * world.cell, 0, Math.PI * 2);
+      ctx.arc(px, py, player.r * world.cell + 4 + Math.min(3, uphillGlow * 6), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(125,211,252,${0.14 + Math.min(0.18, uphillGlow * 0.3)})`;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px, py, player.r * world.cell + Math.min(1.5, vel * 0.05), 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
       ctx.fill();
-
       ctx.beginPath();
       ctx.arc(px - 3, py - 3, 2, 0, Math.PI * 2);
       ctx.fillStyle = '#0f172a';
@@ -459,16 +544,15 @@
       ctx.restore();
     }
 
-    function drawGradientArrow() {
-      if (!world.showHint) return;
+    function drawHintArrow() {
+      if (!(world.hintTimer > 0) || world.state !== 'playing') return;
       const g = gradient(player.x, player.y);
       const n = normalized(g.x, g.y);
       const px = player.x * world.cell;
       const py = player.y * world.cell;
-      const len = 34;
+      const len = 42;
       const ex = px + n.x * len;
       const ey = py + n.y * len;
-
       ctx.save();
       ctx.strokeStyle = '#7dd3fc';
       ctx.fillStyle = '#7dd3fc';
@@ -477,91 +561,221 @@
       ctx.moveTo(px, py);
       ctx.lineTo(ex, ey);
       ctx.stroke();
-
-      const angle = Math.atan2(n.y, n.x);
+      const ang = Math.atan2(n.y, n.x);
       ctx.beginPath();
       ctx.moveTo(ex, ey);
-      ctx.lineTo(ex - 11 * Math.cos(angle - 0.45), ey - 11 * Math.sin(angle - 0.45));
-      ctx.lineTo(ex - 11 * Math.cos(angle + 0.45), ey - 11 * Math.sin(angle + 0.45));
+      ctx.lineTo(ex - 11 * Math.cos(ang - 0.45), ey - 11 * Math.sin(ang - 0.45));
+      ctx.lineTo(ex - 11 * Math.cos(ang + 0.45), ey - 11 * Math.sin(ang + 0.45));
       ctx.closePath();
       ctx.fill();
       ctx.restore();
     }
 
+    function spawnWinParticles() {
+      const px = (world.peak.x + 0.5) * world.cell;
+      const py = (world.peak.y + 0.5) * world.cell;
+      for (let i = 0; i < 42; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const speed = 40 + Math.random() * 110;
+        world.particles.push({
+          x: px, y: py,
+          vx: Math.cos(ang) * speed,
+          vy: Math.sin(ang) * speed,
+          life: 1 + Math.random() * 0.9,
+          maxLife: 1 + Math.random() * 0.9
+        });
+      }
+    }
+
+    function drawParticles(dt) {
+      for (let i = world.particles.length - 1; i >= 0; i--) {
+        const p = world.particles[i];
+        p.life -= dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 20 * dt;
+        if (p.life <= 0) world.particles.splice(i, 1);
+      }
+      ctx.save();
+      for (const p of world.particles) {
+        const a = p.life / p.maxLife;
+        ctx.fillStyle = `rgba(254,240,138,${a})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2 + a * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
     function drawHud() {
       ctx.save();
-      ctx.fillStyle = 'rgba(8, 12, 24, 0.58)';
-      ctx.fillRect(16, 16, 255, 92);
+      ctx.fillStyle = 'rgba(8, 12, 24, 0.56)';
+      ctx.fillRect(16, 16, 355, 92);
       ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-      ctx.strokeRect(16, 16, 255, 92);
-
+      ctx.strokeRect(16, 16, 355, 92);
       ctx.fillStyle = '#eef2ff';
-      ctx.font = 'bold 20px Inter, Arial';
-      ctx.fillText('Find the highest point', 30, 42);
+      ctx.font = 'bold 22px Inter, Arial';
+      ctx.fillText(LEVELS[world.levelIndex].name, 30, 46);
       ctx.font = '15px Inter, Arial';
       ctx.fillStyle = '#cbd5e1';
-      ctx.fillText('Follow the gradient arrow uphill.', 30, 68);
-      ctx.fillText('Reach the glowing circle to win.', 30, 91);
+      ctx.fillText('Find the true highest point.', 30, 72);
+      ctx.fillText('Use the gradient to move uphill.', 30, 94);
       ctx.restore();
+
+      if (world.messageTimer > 0 && world.state === 'playing') {
+        ctx.save();
+        ctx.fillStyle = 'rgba(5,10,20,0.76)';
+        ctx.fillRect(140, canvas.height - 118, 540, 68);
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.strokeRect(140, canvas.height - 118, 540, 68);
+        ctx.fillStyle = '#eef2ff';
+        ctx.font = '18px Inter, Arial';
+        ctx.fillText(world.message, 160, canvas.height - 76);
+        ctx.restore();
+      }
 
       if (world.won) {
         ctx.save();
-        ctx.fillStyle = 'rgba(5, 10, 20, 0.76)';
-        ctx.fillRect(120, 270, 520, 170);
+        ctx.fillStyle = 'rgba(5, 10, 20, 0.8)';
+        ctx.fillRect(125, 275, 570, 205);
         ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.strokeRect(120, 270, 520, 170);
-
+        ctx.strokeRect(125, 275, 570, 205);
         ctx.fillStyle = '#86efac';
         ctx.font = 'bold 42px Inter, Arial';
-        ctx.fillText('Peak reached!', 255, 330);
+        ctx.fillText('Peak reached!', 240, 336);
         ctx.fillStyle = '#eef2ff';
         ctx.font = '20px Inter, Arial';
-        ctx.fillText(`Time: ${world.elapsed.toFixed(1)}s`, 294, 368);
-        ctx.fillText('Press New Level to keep climbing.', 213, 402);
+        ctx.fillText(`Time: ${world.elapsed.toFixed(1)}s`, 328, 374);
+        ctx.fillText(`Takeaway: ${LEVELS[world.levelIndex].takeaway}`, 148, 414);
+        ctx.fillText('Press Next Level to continue.', 248, 448);
         ctx.restore();
       }
     }
 
-    function update(dt) {
-      if (!world.won) {
-        world.elapsed = (performance.now() - world.startTime) / 1000;
-      }
-
-      let dx = 0;
-      let dy = 0;
-      if (keys['ArrowLeft'] || keys['a']) dx -= 1;
-      if (keys['ArrowRight'] || keys['d']) dx += 1;
-      if (keys['ArrowUp'] || keys['w']) dy -= 1;
-      if (keys['ArrowDown'] || keys['s']) dy += 1;
-
-      if (!world.won && (dx !== 0 || dy !== 0)) {
-        const n = normalized(dx, dy);
-        player.x = clamp(player.x + n.x * player.speed * dt, 1, world.w - 2);
-        player.y = clamp(player.y + n.y * player.speed * dt, 1, world.h - 2);
-        player.trail.push({ x: player.x, y: player.y });
-        if (player.trail.length > 160) player.trail.shift();
-      }
-
-      const nearPeak = dist(player.x, player.y, world.peak.x + 0.5, world.peak.y + 0.5) < 3.25;
-      if (!world.won && nearPeak) {
-        world.won = true;
-        world.score += Math.max(50, Math.floor(250 - world.elapsed * 10));
-        ui.score.textContent = world.score;
-      }
-
-      ui.level.textContent = world.level;
-      ui.height.textContent = sample(player.x, player.y).toFixed(3);
-      ui.time.textContent = `${world.elapsed.toFixed(1)}s`;
+    function drawTitleScreen() {
+      world.titlePulse += 0.03;
+      drawFieldBackgroundOnly();
+      ctx.save();
+      ctx.fillStyle = 'rgba(5, 10, 20, 0.62)';
+      ctx.fillRect(90, 120, 640, 560);
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.strokeRect(90, 120, 640, 560);
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 64px Inter, Arial';
+      ctx.fillText('Potential Hill', 180, 220);
+      ctx.fillStyle = '#eef2ff';
+      ctx.font = '24px Inter, Arial';
+      ctx.fillText('A Unit 6 game about potential and gradient', 178, 272);
+      ctx.font = '22px Inter, Arial';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('Five short levels. Each one adds one new idea.', 185, 340);
+      ctx.fillText('Climb uphill, avoid traps, and find the true maximum.', 154, 382);
+      const pulse = 1 + Math.sin(world.titlePulse) * 0.05;
+      ctx.fillStyle = `rgba(125,211,252,${0.25 + Math.sin(world.titlePulse) * 0.08})`;
+      ctx.fillRect(240, 510, 340 * pulse, 70);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px Inter, Arial';
+      ctx.fillText('Press Enter to Start', 246, 556);
+      ctx.font = '18px Inter, Arial';
+      ctx.fillStyle = '#b9c2e3';
+      ctx.fillText('Move with WASD or arrow keys', 275, 620);
+      ctx.restore();
     }
 
-    function render() {
+    function drawFieldBackgroundOnly() {
+      for (let y = 0; y < world.h; y++) {
+        for (let x = 0; x < world.w; x++) {
+          const t = (Math.sin(x * 0.12 + world.titlePulse) + Math.cos(y * 0.08 + world.titlePulse)) * 0.5;
+          const v = (t + 1) / 2;
+          const r = Math.floor(30 + v * 150);
+          const g = Math.floor(50 + v * 120);
+          const b = Math.floor(95 + v * 110);
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          ctx.fillRect(x * world.cell, y * world.cell, Math.ceil(world.cell), Math.ceil(world.cell));
+        }
+      }
+    }
+
+    function update(dt) {
+      world.shimmer += dt * 3.2;
+      if (world.state === 'title') {
+        ui.state.textContent = 'Title';
+        return;
+      }
+
+      if (!world.won) world.elapsed = (performance.now() - world.startTime) / 1000;
+      if (world.hintTimer > 0) world.hintTimer -= dt;
+      if (world.messageTimer > 0) world.messageTimer -= dt;
+      if (world.peakPop > 0) world.peakPop = Math.max(0, world.peakPop - dt * 1.8);
+
+      let ax = 0, ay = 0;
+      if (keys['ArrowLeft'] || keys['a']) ax -= 1;
+      if (keys['ArrowRight'] || keys['d']) ax += 1;
+      if (keys['ArrowUp'] || keys['w']) ay -= 1;
+      if (keys['ArrowDown'] || keys['s']) ay += 1;
+
+      if (!world.won) {
+        const move = normalized(ax, ay);
+        const level = LEVELS[world.levelIndex];
+        const terrainFactor = level.hardTerrain ? 0.92 + Math.max(0, 0.08 - sample(player.x, player.y) * 0.03) : 1;
+        player.vx += move.x * player.accel * dt * terrainFactor;
+        player.vy += move.y * player.accel * dt * terrainFactor;
+        player.vx *= Math.pow(player.friction, dt * 60);
+        player.vy *= Math.pow(player.friction, dt * 60);
+
+        const speed = Math.hypot(player.vx, player.vy);
+        const currentMax = level.hardTerrain ? 12.8 : player.maxSpeed;
+        if (speed > currentMax) {
+          player.vx = player.vx / speed * currentMax;
+          player.vy = player.vy / speed * currentMax;
+        }
+
+        player.x = clamp(player.x + player.vx * dt, 1, world.w - 2);
+        player.y = clamp(player.y + player.vy * dt, 1, world.h - 2);
+
+        if (speed > 0.3) {
+          player.trail.push({ x: player.x, y: player.y, v: sample(player.x, player.y) });
+          if (player.trail.length > 180) player.trail.shift();
+        }
+      }
+
+      const nearPeak = dist(player.x, player.y, world.peak.x + 0.5, world.peak.y + 0.5) < 3.3;
+      if (!world.won && nearPeak) {
+        world.won = true;
+        world.peakPop = 0.22;
+        const level = LEVELS[world.levelIndex];
+        const gained = Math.max(80, Math.floor(level.timeBonus - world.elapsed * 18 + world.hintsLeft * 20));
+        world.score += gained;
+        const best = world.bestTimes[world.levelIndex];
+        if (best == null || world.elapsed < best) world.bestTimes[world.levelIndex] = world.elapsed;
+        spawnWinParticles();
+      }
+
+      const g = gradient(player.x, player.y);
+      ui.state.textContent = world.won ? 'Won' : 'Playing';
+      ui.level.textContent = `${world.levelIndex + 1} / ${LEVELS.length}`;
+      ui.score.textContent = world.score;
+      ui.time.textContent = `${world.elapsed.toFixed(1)}s`;
+      ui.height.textContent = sample(player.x, player.y).toFixed(3);
+      ui.grad.textContent = `(${g.x.toFixed(2)}, ${(-g.y).toFixed(2)})`;
+      ui.hints.textContent = world.hintsLeft;
+      ui.best.textContent = world.bestTimes[world.levelIndex] == null ? '--' : `${world.bestTimes[world.levelIndex].toFixed(1)}s`;
+    }
+
+    function render(dt) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (world.state === 'title') {
+        drawTitleScreen();
+        return;
+      }
       drawField();
       drawContours();
+      drawVectorField();
       drawPeak();
       drawTrail();
-      drawGradientArrow();
+      drawHintArrow();
       drawPlayer();
+      drawParticles(dt);
       drawHud();
     }
 
@@ -570,35 +784,52 @@
       const dt = Math.min((now - last) / 1000, 0.033);
       last = now;
       update(dt);
-      render();
+      render(dt);
       requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      if (world.state === 'title') buildLevel(0, false);
+    }
+
+    function restartLevel() {
+      if (world.state !== 'title') buildLevel(world.levelIndex, true);
+    }
+
+    function nextLevel() {
+      if (world.levelIndex < LEVELS.length - 1) buildLevel(world.levelIndex + 1, true);
+      else {
+        world.state = 'title';
+        world.message = '';
+      }
+    }
+
+    function useHint() {
+      if (world.state !== 'playing' || world.won || world.hintsLeft <= 0) return;
+      world.hintsLeft -= 1;
+      world.hintTimer = 4.5;
     }
 
     window.addEventListener('keydown', (e) => {
       keys[e.key] = true;
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
-        e.preventDefault();
-      }
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+      if (e.key === 'Enter' && world.state === 'title') startGame();
+      if (e.key.toLowerCase() === 'r' && world.state !== 'title') restartLevel();
+      if (e.key.toLowerCase() === 'h' && world.state === 'playing') useHint();
+      if (e.key.toLowerCase() === 'n' && world.won) nextLevel();
     });
 
-    window.addEventListener('keyup', (e) => {
-      keys[e.key] = false;
-    });
+    window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-    ui.newBtn.addEventListener('click', () => {
-      world.level += 1;
-      buildLevel(world.level);
-    });
+    ui.startBtn.addEventListener('click', startGame);
+    ui.restartBtn.addEventListener('click', restartLevel);
+    ui.nextBtn.addEventListener('click', nextLevel);
+    ui.hintBtn.addEventListener('click', useHint);
+    ui.fieldBtn.addEventListener('click', () => { world.showVectorField = !world.showVectorField; });
+    ui.contourBtn.addEventListener('click', () => { world.showContours = !world.showContours; });
 
-    ui.hintBtn.addEventListener('click', () => {
-      world.showHint = !world.showHint;
-    });
-
-    ui.contourBtn.addEventListener('click', () => {
-      world.showContours = !world.showContours;
-    });
-
-    buildLevel(world.level);
+    buildLevel(0, false);
+    world.state = 'title';
     requestAnimationFrame(loop);
   </script>
 </body>
